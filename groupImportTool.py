@@ -86,8 +86,7 @@ def get_token():
     token = r.json()["access_token"]
     BEARER_HEADER = {"Authorization": "Bearer {}".format(token)}
 
-# Fetches all users on current page then deletes them
-# If there is a next page, fetch it and continue deletion
+# TODO:  change to a function that will look over the group json file to find the group id
 @sleep_and_retry
 @limits(calls = 95, period = 1)
 def delete_page(page):

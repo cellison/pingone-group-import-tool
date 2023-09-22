@@ -89,33 +89,10 @@ def get_token():
 # TODO:  change to a function that will look over the group json file to find the group id
 @sleep_and_retry
 @limits(calls = 95, period = 1)
-def delete_page(page):
-    users = []
-    index = 1
-    while True:
-        # Delete users on current page
-        for user in page["_embedded"]["users"]:
-            if not user["id"] in SKIP_USER_IDS:
-                delete_user(user)
+def find_group(groupid):
 
-        # If there's a next page link, follow it
-        if "next" in page["_links"]:
-            # Parse and follow the next link from response
-            link = page["_links"]["next"]["href"]
-            try:
-                if VERBOSE:
-                    print("Fetching next page... ({})".format(str(index)))
-                r = requests.get(link, headers = BEARER_HEADER)
-                r.raise_for_status()
-                index += 1
-            except requests.exceptions.HTTPError as e:
-                log_error("Error fetching users", r)
 
-            page = r.json()
-        else:
-            break
-
-# Add user
+# Add user to group
 @sleep_and_retry
 @limits(calls = 95, period = 1)
 def add_user(user):

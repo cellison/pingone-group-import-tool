@@ -116,7 +116,7 @@ def delete_page(page):
         else:
             break
 
-# Delete a user
+# Add user
 @sleep_and_retry
 @limits(calls = 95, period = 1)
 def add_user(user):
@@ -125,10 +125,10 @@ def add_user(user):
     attempt = 1
     while (attempt <= MAX_ATTEMPTS):
         try:
-            r = requests.delete(delete_url, headers = BEARER_HEADER, timeout=5)
+            r = requests.delete(group_url, headers = BEARER_HEADER, timeout=5)
             r.raise_for_status()
             if VERBOSE:
-                print("Deleting {} ({})".format(user["username"], user_id))
+                print("Adding user {} ({}) to group".format(user["username"], user_id))
             break
         except requests.exceptions.HTTPError as e:
             # If the status code is 401, refresh token and retry
@@ -137,7 +137,7 @@ def add_user(user):
                     print("Refreshing token...")
                 get_token()
             else:
-                log_error("Error deleting user {}".format(user_id), r)
+                log_error("Error adding user {}".format(user_id), r)
         if VERBOSE:
             print("Retrying... attempt {}/{}".format(attempt, MAX_ATTEMPTS))
         attempt += 1
@@ -170,7 +170,7 @@ with open(USERS_TO_ADD, 'r') as read_obj:
                         if QUERY:
                             msg += " matching {}".format(QUERY)
                         print(msg)
-                        delete_page(r.json())
+                        add_user(r.json())
                         break
                     except requests.exceptions.HTTPError as e:
                         # If the status code is 401, refresh token and retry
